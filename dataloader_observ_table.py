@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 #settings
-variables_of_interest = ['15001555', '15001525', '15001552', '15002241', '15002241','10002308','10002502', '10002523']
+variables_of_interest = ['15001552']
 
 #enviroment variables
 data_path = "/cluster/work/grlab/clinical/Inselspital/DataReleases/01-19-2017/InselSpital/"

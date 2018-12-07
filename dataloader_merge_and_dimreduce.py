@@ -31,7 +31,7 @@ for patientID in df_gen.PatientID:
 	#reduce dimensionality
 	df_concat["m20"] = df_concat[['4000', '8280']].mean(axis=1)
 	df_concat["m21"] = df_concat[['2200', '8290', '30010009']].mean(axis=1)
-	df_concat["m2"] = df_concat[['410', '7100', '400']].mean(axis=1)
+	df_concat["m2"] = df_concat[['410', '7100', '400', '7120']].mean(axis=1)
 
 	if len(df_concat.index) > 0:
 		df_concat.to_hdf(output_data_file, 'pivoted', append=True, complevel=5, complib='blosc:lz4', data_columns=['PatientID'], format='table')
