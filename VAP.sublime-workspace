@@ -144,13 +144,19 @@
 	"buffers":
 	[
 		{
-			"contents": "import os\nimport pandas as pd\nimport numpy as np\n\n#settings\nvariables_of_interest = ['2200', '4000', '8290', '8280', '200', '410', '7100', '400', , , '300', '310', '5685', '2010', '2600', '2610', '3845', '2410', '2400', '3110', '3200', '3000',\n\t '320', '7150', '420', '7120', '7110', '7130', '7140', '7150', '430', '3950', '341', '2510','2520','2530', '2910', '2900','3501', '3730']\n\n#enviroment variables\ndata_path = \"/cluster/work/grlab/clinical/Inselspital/DataReleases/01-19-2017/InselSpital/\"\ninput_dir = \"1_hdf5_consent/180704\"\noutput_dir = \"derived_mafacz/VAP\"\ngeneral_data_file = os.path.join(data_path, input_dir, \"generaldata.h5\")\nmon_data_file = os.path.join(data_path, input_dir, \"monvals.h5\")\noutput_data_file = os.path.join(data_path, output_dir, \"monvals_pivot.h5\")\n\n#Read General File for Patient IDs\ndf_gen = pd.read_hdf(general_data_file)\n\n#Loop trough all patients and add them to preprocessed table\nfor patientID in df_gen.PatientID:\n\tprint(patientID)\n\tdf_mon_pat = pd.read_hdf(mon_data_file, where='PatientID==' + str(patientID))\n\tdf_mon_pat = df_mon_pat[df_mon_pat.Value.notnull()]\n\tdf_mon_pat = df_mon_pat[df_mon_pat.VariableID.isin(variables_of_interest)]\n\t#pivot table and change to 1Min interval\n\t#df_mon_pat.Value = df_mon_pat.Value.astype('float64')\n\tdf_mon_pat = df_mon_pat.pivot_table(index='Datetime', columns='VariableID', values='Value') #dupplicate values -> mean\n\tdf_mon_pat = df_mon_pat.resample('1Min').mean()\n\tdf_mon_pat = df_mon_pat.rename(columns={x:str(x) for x in df_mon_pat.columns})\n\t#add PatientID column\n\tdf_mon_pat['PatientID'] = patientID\n\tdf_mon_pat = df_mon_pat.set_index('PatientID', append=True)\n\t#add columns of interest which are missing for this patient with nan as value\n\tmissing_columns = set(variables_of_interest) - set(df_mon_pat.columns)\n\tfor col in missing_columns:\n\t\tdf_mon_pat[col] = np.nan\n\n\tif len(df_mon_pat) > 0:\n\t\tdf_mon_pat.to_hdf(output_data_file, 'pivoted', append=True, complevel=5, complib='blosc:lz4', \n\t\t\tdata_columns=['PatientID', 'VariableID'], format='table')\n\n\t\n\t\n",
-			"file": "dataloader_mon_table.py",
-			"file_size": 2024,
-			"file_write_time": 131842815011350671,
+			"file": "dataloader_merge_and_dimreduce.py",
 			"settings":
 			{
-				"buffer_size": 2044,
+				"buffer_size": 2116,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dataloader_patient_table_for_vap.py",
+			"settings":
+			{
+				"buffer_size": 2115,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -160,31 +166,15 @@
 			"settings":
 			{
 				"buffer_size": 1720,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "dataloader_mon_table.py",
+			"settings":
+			{
+				"buffer_size": 1981,
 				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "dataloader_derv_table.py",
-			"settings":
-			{
-				"buffer_size": 1704,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "dataloader_observ_table.py",
-			"settings":
-			{
-				"buffer_size": 1849,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "dataloader_final_table.py",
-			"settings":
-			{
-				"buffer_size": 8175,
 				"line_ending": "Unix"
 			}
 		}
@@ -249,13 +239,14 @@
 	],
 	"file_history":
 	[
+		"/home/mafacz/source/VAP/dataloader_mon_table.py",
+		"/home/mafacz/source/VAP/dataloader_lab_table.py",
+		"/home/mafacz/source/VAP/dataloader_derv_table.py",
+		"/home/mafacz/source/VAP/dataloader_observ_table.py",
 		"/home/mafacz/source/VAP/variable_references.py",
 		"/home/mafacz/source/VAP/variable_exploration.py",
-		"/home/mafacz/source/VAP/dataloader_observ_table.py",
 		"/home/mafacz/source/VAP/sync_to_cluster.sh",
-		"/home/mafacz/source/VAP/dataloader_derv_table.py",
 		"/home/mafacz/source/VAP/dataloader_patient_table_for_vap.py",
-		"/home/mafacz/source/VAP/dataloader_lab_table.py",
 		"/home/mafacz/source/VAP/dataloader_merge_and_dimreduce.py",
 		"/home/mafacz/source/VAP/variable_exploration_temp.py",
 		"/home/mafacz/source/OxygenationIndex/dataloader_lab_table.py",
@@ -288,7 +279,7 @@
 	],
 	"find":
 	{
-		"height": 50.0
+		"height": 38.0
 	},
 	"find_in_files":
 	{
@@ -385,24 +376,65 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 0,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "dataloader_mon_table.py",
+					"file": "dataloader_merge_and_dimreduce.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2044,
+						"buffer_size": 2116,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								115,
-								115
+								1461,
+								1461
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
+							"git_gutter_is_enabled": true,
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "dataloader_patient_table_for_vap.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2115,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1905,
+								1905
 							]
 						],
 						"settings":
@@ -430,7 +462,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 1,
+					"buffer": 2,
 					"file": "dataloader_lab_table.py",
 					"semi_transient": false,
 					"settings":
@@ -442,68 +474,8 @@
 						"selection":
 						[
 							[
-								95,
-								95
-							]
-						],
-						"settings":
-						{
-							"git_gutter_is_enabled": true,
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "dataloader_derv_table.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1704,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								528,
-								528
-							]
-						],
-						"settings":
-						{
-							"git_gutter_is_enabled": true,
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "dataloader_observ_table.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1849,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
+								94,
+								94
 							]
 						],
 						"settings":
@@ -520,20 +492,20 @@
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": "dataloader_final_table.py",
-					"semi_transient": true,
+					"buffer": 3,
+					"file": "dataloader_mon_table.py",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 8175,
+						"buffer_size": 1981,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								91,
+								91
 							]
 						],
 						"settings":
@@ -554,7 +526,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 47.2
+		"height": 38.0
 	},
 	"input":
 	{
@@ -599,7 +571,7 @@
 	"project": "VAP.sublime-project",
 	"replace":
 	{
-		"height": 90.4
+		"height": 72.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -619,7 +591,7 @@
 		[
 			[
 				"",
-				"~/source/OxygenationIndex/OxygenationIndex.sublime-project"
+				"~/source/GOSSIS/GOSSIS.sublime-project"
 			]
 		],
 		"width": 475.0
